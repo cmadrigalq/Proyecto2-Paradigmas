@@ -6,6 +6,18 @@
 ;	II Ciclo 2018
 
 #lang racket
+
+polinomio de grado n-1
+(n × an) xn-1 + ((n-1) × an-1) xn-2 + ... + 2a2 x + a1
+      (define calc
+         (lambda (exp)
+            (cond
+               ((number? exp) exp)
+               ((equal? (car exp) '+) (+ (calc (cadr exp)) (calc (caddr exp))))
+               ((equal? (car exp) '*) (* (calc (cadr exp)) (calc (caddr exp)))))))
+
+;*******************agregado recientemente******************
+
 ;car devuelve primer elemento, cdr lo elimina
 (define L '(1 2 3 4 0 0 0))
 

@@ -7,6 +7,9 @@
 
 #lang racket
 
+;*******************agregado recientemente*****************
+http://www.inf.puc-rio.br/~roberto/icc/texto/icc.html
+
 polinomio de grado n-1
 (n × an) xn-1 + ((n-1) × an-1) xn-2 + ... + 2a2 x + a1
       (define calc

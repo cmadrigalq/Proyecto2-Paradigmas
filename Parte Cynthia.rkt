@@ -62,7 +62,7 @@
 )
 (define despliegue
     (lambda (L)
-        (printL L 0)
+        (display(printL L 0))
     )
 )    
 ;Meodo para ayudar sumas y restas
@@ -85,28 +85,86 @@
   (lambda (L1 L2 i)
     (cond((< i (length L1))
           (cons ( + (list-ref L1 i) (list-ref L2 i)) (sumar L1 L2 (+ i 1)))   
-     )(else '())
+     ) (else '())
     )
   )
 )
 
-;NO FUNCIONA AUN!!!
-(define suma
-  (lambda (L);recibe una lista de listas
-    (cond((= 1 (length L))
-          (simplificar (list-ref L 0))
-     )(else(cond(;segunda condicion
-            (> 2 (length L))
-            (suma (append(suma(cons(car L) (cons (car(cdr L))'()) )) (cddr L)))
-       )
-       (else (
+
+(define sumapolinomios
+  (lambda (L1);recibe una lista de listas
+    (cond ( (> (length L1) 2)
+          (sumapolinomios (cons(sumapolinomios(cons(car L1) (cons (car(cdr L1))'()) )) (cddr L1)));THEN
+      )(else (
               simplificar(
-                 sumar (car L)(car(car L)) 0
+                  sumar (emparejar(car L1)(list-ref L1 1)) (emparejar(list-ref L1 1)(car L1)) 0
               )
-        ))));final de la segunda condicion
+             )
+        )
     )
   )
 )
+(define suma
+   (lambda (L)
+       (despliegue (sumapolinomios L))
+    )
+)
+;RESTAR
+;[1 2 3] - [1 2 3] = [0 0 0]
+;[1 2 3] - [1 2] => (1 + 2x + 3x^2) - (1 + 2x + 0x^2)
+;[1 2 3] - [1 0 3]
+;(1 2x 3x^2) - (1 + 0x +3x^2)
+(define restar
+  (lambda (L1 L2 i)
+    (cond((< i (length L1))
+          (cons ( - (list-ref L1 i) (list-ref L2 i)) (restar L1 L2 (+ i 1)))   
+     ) (else '())
+    )
+  )
+)
+(define restapolinomios
+  (lambda (L1);recibe una lista de listas
+    (cond ( (> (length L1) 2)
+          (restapolinomios (cons(restapolinomios(cons(car L1) (cons (car(cdr L1))'()) )) (cddr L1)));THEN
+      )(else (
+              simplificar(
+                  restar (emparejar(car L1)(list-ref L1 1)) (emparejar(list-ref L1 1)(car L1)) 0
+              )
+             )
+        )
+    )
+  )
+)
+(define resta
+   (lambda (L)
+       (despliegue (restapolinomios L))
+    )
+)
+
+;DERIVAR
+(define derivarSubLista
+  (lambda (subL index)
+      (cond( (< index (length subL))
+             (append (cons(* index (list-ref subL index)) '() ) (derivarSubLista subL (+ 1 index)))
+       )(else '())
+      )
+   )
+)
+(define derivarPolinomios
+   (lambda(L index)
+       (cond( (< index(length L))
+              (despliegue(simplificar(derivarSubLista(list-ref L index) 1)))
+              (newline)
+              (derivarPolinomios (cdr L) 0)       )
+      )
+    )
+)
+(define derivar
+ (lambda (L)
+     (derivarPolinomios L 0)
+  )
+)
+
 
 
 ;****************************PRUEBAS***************************
@@ -115,3 +173,6 @@
 ;(printE 0 9) || (printE 2 5) || (printE 8 0)
 ;(despliegue L)
 ;(emparejar '(1) '(1 2 3 4 5))
+;(suma '((1 2 3) (-1 6 5 9 7) (-2 3) (1) ))
+;(resta '((1 2 3) (-1 6 5 9 7) (-2 3) (1) ))
+;(derivar '((1 2 3) (3 4 5 6 7) (5555 7 8 6) ))

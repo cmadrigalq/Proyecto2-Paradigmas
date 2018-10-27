@@ -21,6 +21,16 @@ polinomio de grado n-1
 
 ;*******************agregado recientemente******************
 
+%Evaluacion de polinomios
+
+evalPol([], _X, 0).
+ 
+evalPol([H|T], X, V) :-
+	evalPol(T, X, V1),
+	V is V1 * X + H.
+
+;*******************agregado recientemente******************
+
 ;car devuelve primer elemento, cdr lo elimina
 (define L '(1 2 3 4 0 0 0))
 

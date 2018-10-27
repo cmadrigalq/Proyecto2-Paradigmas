@@ -8,9 +8,9 @@
 #lang racket
 
 ;*******************agregado recientemente*****************
-http://www.inf.puc-rio.br/~roberto/icc/texto/icc.html
+; http://www.inf.puc-rio.br/~roberto/icc/texto/icc.html
 
-polinomio de grado n-1
+;polinomio de grado n-1
 (n × an) xn-1 + ((n-1) × an-1) xn-2 + ... + 2a2 x + a1
       (define calc
          (lambda (exp)
@@ -18,6 +18,41 @@ polinomio de grado n-1
                ((number? exp) exp)
                ((equal? (car exp) '+) (+ (calc (cadr exp)) (calc (caddr exp))))
                ((equal? (car exp) '*) (* (calc (cadr exp)) (calc (caddr exp)))))))
+
+;*******************agregado recientemente******************
+
+; Funcion para evaluar polinomios
+
+(define (horner x l) 
+    (foldr (lambda (a b) (+ a (* b x))) 0 l))
+
+; **************************************************************
+; Esta es otra implementación de la funcion
+
+(define (evalPol x l) 
+    (doblar (lambda (a b) (+ a (* b x))) 0 l))
+
+; Funcion foldr implementada
+
+(define (doblar funcion final lista)
+  (if (null? lista)
+      final
+      (funcion (car lista) (foldr funcion final (cdr lista)))))
+
+; Otra implementación para la funcion foldr
+(define (my-foldr proc init lst)
+  (cond
+    [(empty? lst) init]
+    [else
+     (proc (first lst)
+           (my-foldr proc
+                     init
+                     (rest lst)))]))
+
+; **************************************************************
+
+(evalPol 3 '(-19 7 -4 6))
+(horner 3 '(-19 7 -4 6))
 
 ;*******************agregado recientemente******************
 

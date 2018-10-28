@@ -7,7 +7,9 @@
 
 #lang racket
 
-;*******************agregado recientemente*****************
+(require racket/list)
+
+;***************************************** agregado recientemente *****************************************
 ; http://www.inf.puc-rio.br/~roberto/icc/texto/icc.html
 
 ;polinomio de grado n-1
@@ -19,20 +21,19 @@
                ((equal? (car exp) '+) (+ (calc (cadr exp)) (calc (caddr exp))))
                ((equal? (car exp) '*) (* (calc (cadr exp)) (calc (caddr exp)))))))
 
-;*******************agregado recientemente******************
+;******************************************* agregado recientemente *******************************************
 
-; Funcion para evaluar polinomios
+;*************************************** Funcion para evaluar polinomios **************************************
 
 (define (horner x l) 
     (foldr (lambda (a b) (+ a (* b x))) 0 l))
 
-; **************************************************************
-; Esta es otra implementación de la funcion
+;********************************* Esta es otra implementación de la funcion **********************************
 
 (define (evalPol x l) 
     (doblar (lambda (a b) (+ a (* b x))) 0 l))
 
-; Funcion foldr implementada
+; Funcion foldr implementada, la cual es usada por la funcion anterior
 
 (define (doblar funcion final lista)
   (if (null? lista)
@@ -49,51 +50,99 @@
                      init
                      (rest lst)))]))
 
-; *****************************Evaluacion de la funcion*********************************
+;******************************************* Evaluacion de la funcion *******************************************
 
 (evalPol 3 '(-19 7 -4 6))
 (horner 3 '(-19 7 -4 6))
 
-;*******************agregado recientemente******************
+;*****************************************************************************************************************
 
 ; Implementacion de la funcion para dividir polinomios
-; Esta funcion genera una lista con los valores del residuo y otra lista con los valores del cociente
 
-(define (grado p) 
-  (for/fold ([d -inf.0]) ([(pi i) (in-indexed p)])
-    (if (zero? pi) d i)))
-(define (lead p) (vector-ref p (grado p)))
-(define (mono c d) (build-vector (+ d 1) (λ(i) (if (= i d) c 0))))
-(define (divPol*cx^n c n p) (vector-append (make-vector n 0) (for/vector ([pi p]) (* c pi))))
-(define (divPol+ p q) (divPol/lin 1 p  1 q))
-(define (divPol- p q) (divPol/lin 1 p -1 q))
-(define (divPol/lin a p b q)
-  (cond [(< (grado p) 0) q] 
-        [(< (grado q) 0) p]
-        [(< (grado p) (grado q)) (divPol/lin b q a p)]
-        [else (define ap+bq (for/vector #:length (+ (grado p) 1) #:fill 0
-                              ([pi p] [qi q]) (+ (* a pi) (* b qi))))
-              (for ([i (in-range (+ (grado q) 1) (+ (grado p) 1))])
-                (vector-set! ap+bq i (* a (vector-ref p i))))
-              ap+bq]))
- 
-(define (divPol/ n d)
-  (define N (grado n))
-  (define D (grado d))
-  (cond
-    [(< N 0) (error 'divPol/ "No puede dividir entre 0")]
-    [(< N D) (values 0 n)]
-    [else    (define c (/ (lead n) (lead d)))
-             (define q (mono c (- N D)))
-             (define r (divPol- n (divPol*cx^n c (- N D) d)))
-             (define-values (q1 r1) (divPol/ r d))
-             (values (divPol+ q q1) r1)]))
+;*************************************** Division de polinomios - Parte 1 ****************************************
+;(require racket/list)
 
-; *****************************Evaluacion de la funcion*********************************
+(define (qt-p p1 p2)
+  (define out (list->vector p1))
+  (define normaliser (car p2))
+  (define p2-length (length p2))
+  (define out-length (vector-length out))
+  (for ((i (in-range 0 (- out-length p2-length -1))))
+    (vector-set! out i (quotient (vector-ref out i) normaliser))
+    (define coef (vector-ref out i))
+    (unless (zero? coef)
+      (for ((i+j (in-range (+ i 1)
+                           (+ i p2-length)))
+            (p2_j (in-list (cdr p2))))
+        (vector-set! out i+j (+ (vector-ref out i+j) (* coef p2_j -1))))))
+  (split-at (vector->list out) (- out-length (sub1 p2-length))))
 
-(divPol/ #(-42 0 -12 1) #(-3 1))
 
-;*******************agregado recientemente******************
+
+;************************************* Evaluacion de la funcion - Parte 1 *************************************
+
+(module+ main
+  (displayln "Division de polinomios - Parte 1")
+  (define N '(1 -12 0 -42))
+  (define D '(1 -3))
+  (define-values (Q R) (qt-p N D))
+  (printf "El cociente de ~a / ~a es ~a~%" N D Q))
+
+;*************************************** Division de polinomios - Parte 2 ***************************************
+;(require racket/list)
+
+(define (rem-p p1 p2)
+  (define out (list->vector p1))
+  (define normaliser (car p2))
+  (define p2-length (length p2))
+  (define out-length (vector-length out))
+  (for ((i (in-range 0 (- out-length p2-length -1))))
+    (vector-set! out i (quotient (vector-ref out i) normaliser))
+    (define coef (vector-ref out i))
+    (unless (zero? coef)
+      (for ((i+j (in-range (+ i 1)
+                           (+ i p2-length)))
+            (p2_j (in-list (cdr p2))))
+        (vector-set! out i+j (+ (vector-ref out i+j) (* coef p2_j -1))))))
+  (split-at (vector->list out) (- out-length (sub1 p2-length))))
+
+;**************************************** Evaluacion de la funcion - Parte 2 ******************************************
+
+(module+ main
+  (displayln "Division de polinomios - Parte 1")
+  (define N '(1 -12 0 -42))
+  (define D '(1 -3))
+  (define-values (Q R) (qt-p N D))
+  (printf "El residuo de ~a / ~a es ~a~%" N D R))
+
+;****************************************** Division de polinomios - Parte 3 ******************************************
+;(require racket/list)
+
+(define (/-p p1 p2)
+  (define out (list->vector p1))
+  (define normaliser (car p2))
+  (define p2-length (length p2))
+  (define out-length (vector-length out))
+  (for ((i (in-range 0 (- out-length p2-length -1))))
+    (vector-set! out i (quotient (vector-ref out i) normaliser))
+    (define coef (vector-ref out i))
+    (unless (zero? coef)
+      (for ((i+j (in-range (+ i 1)
+                           (+ i p2-length)))
+            (p2_j (in-list (cdr p2))))
+        (vector-set! out i+j (+ (vector-ref out i+j) (* coef p2_j -1))))))
+  (split-at (vector->list out) (- out-length (sub1 p2-length))))
+  
+;************************************* Evaluacion de la funcion - Parte 3 *************************************
+
+(module+ main
+  (displayln "Division de polinomios - Parte 3")
+  (define N '(1 -12 0 -42))
+  (define D '(1 -3))
+  (define-values (Q R) (/-p N D))
+  (printf "(~a ~a)" Q R))
+  
+;******************************************* agregado recientemente *******************************************
 
 ;car devuelve primer elemento, cdr lo elimina
 (define L '(1 2 3 4 0 0 0))

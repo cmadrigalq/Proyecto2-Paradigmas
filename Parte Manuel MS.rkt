@@ -25,22 +25,22 @@
 
 ;*************************************** Funcion para evaluar polinomios **************************************
 
-(define (horner x l) 
+(define (eval-p x l) 
     (foldr (lambda (a b) (+ a (* b x))) 0 l))
 
 ;********************************* Esta es otra implementación de la funcion **********************************
 
-(define (evalPol x l) 
+(define (eval-p2 x l) 
     (doblar (lambda (a b) (+ a (* b x))) 0 l))
 
-; Funcion foldr implementada, la cual es usada por la funcion anterior
+; Funcion foldr implementada, la cual es usada por la funcion eval-p2
 
 (define (doblar funcion final lista)
   (if (null? lista)
       final
       (funcion (car lista) (foldr funcion final (cdr lista)))))
 
-; Otra implementación para la funcion foldr
+; Otra implementación para la funcion foldr, no se esta usando pero se puede usar (si funciona)
 (define (my-foldr proc init lst)
   (cond
     [(empty? lst) init]

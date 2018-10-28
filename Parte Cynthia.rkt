@@ -164,6 +164,35 @@
      (derivarPolinomios L 0)
   )
 )
+;Potencia
+; (b,e)=> b^e
+(define pow
+  (lambda (b e)
+    (cond ((and (zero? e) (zero? b)) (display "Math Error!"))
+    (else (cond ((zero? e) 1)
+    (else (* b (pow b (- e 1)))))))
+  )
+)
+
+
+;Evaluar : (3+3x+(3x^2)+...+(3x^n),6) => (3+3*6+(3*6^2)+...+(3*6^n),y)
+(define mapEval
+  (lambda (L x index)
+     (cond ( (< index (length L))
+             ( + (* (list-ref L index) (pow x index)) (mapEval L x (+ 1 index)) ))
+             (else 0))
+  )
+)
+(define eval
+  (lambda (L x)
+      (despliegue L)
+      (display ", ")
+      (display x)
+      (display " =>")
+      (display (mapEval L x 0))
+   )
+)
+
 
 
 
@@ -176,3 +205,7 @@
 ;(suma '((1 2 3) (-1 6 5 9 7) (-2 3) (1) ))
 ;(resta '((1 2 3) (-1 6 5 9 7) (-2 3) (1) ))
 ;(derivar '((1 2 3) (3 4 5 6 7) (5555 7 8 6) ))
+;(pow 0 0)
+;(pow 5 3)
+;(pow 555 0)
+;(eval '(-1 4 2) 2)

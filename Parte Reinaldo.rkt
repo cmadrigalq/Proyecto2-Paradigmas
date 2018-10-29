@@ -6,43 +6,31 @@
 ;	II Ciclo 2018
 
 #lang racket
-;car devuelve primer elemento, cdr lo elimina
-(define L '(1 2 3 4 0 0 0))
 
-;Elimina el ultimo elemento de la lista
-(define remove-last
-  (lambda(lst)
-    (if (null? (cdr lst)) 
-     '() 
-     (cons (car lst) (remove-last (cdr lst))))))           
+(define (divisor? x y)
+      (= 0 (remainder y x)))
 
-;[1 2 3 4 0 0 0] => [1 2 3 4]
-(define simplificar
-  (lambda(Lst)
-    (cond ( (zero?(list-ref Lst (- (length Lst) 1)) ) (simplificar(remove-last Lst)) )
-          (else Lst)
-    )
-   ))
-   
-;(e,i) => ex^i
-(define printE
-  (lambda (e i)
-    (
-      cond( (zero? e) "")
-         (else (
-             cond((zero? i)(number->string e))
-             (else (
-                    string-append (cond((> e 0 ) "+" )(else ""))
-                                  (cond((= i 1)
-                                       (string-append (number->string e) "x"))
-                                       (else (string-append (number->string e) (string-append "x^" (number->string i)))))
-             ))    
-         ))
-    )
-    )
-  )
+(define (filtra-divisores lista x)
+   (cond
+      ((null? lista) '())
+      ((divisor? (car lista) x) (cons (car lista)
+                                      (filtra-divisores (cdr lista) x)))
+      (else (filtra-divisores (cdr lista) x))))
 
+(define (divisores x)
+   (concatenar (filtra-divisores (lista-hasta x) x) (map - (filtra-divisores (lista-hasta x) x))))
+
+(define (lista-hasta x)
+   (if (= x 0)
+      '()
+      (cons x (lista-hasta (- x 1)))))
+
+(define concatenar
+  (lambda (L1 L2)
+    (cond ((null? L1) L2)
+          ((null? L2) L1)
+          (else
+           (cons (car L1) (concatenar (cdr L1) L2)))
+          )))
 ;****************************PRUEBAS***************************
-;(remove-last L)
-;(simplificar L)
-;(printE 0 9) || (printE 2 5) || (printE 8 0)
+;(divisores 6)

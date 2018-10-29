@@ -105,6 +105,45 @@
   )
 )
 
+(define suma
+   (lambda (L)
+       (despliegue (sumapolinomios L))
+    )
+)
+
+;RESTAR
+;[1 2 3] - [1 2 3] = [0 0 0]
+;[1 2 3] - [1 2] => (1 + 2x + 3x^2) - (1 + 2x + 0x^2)
+;[1 2 3] - [1 0 3]
+;(1 2x 3x^2) - (1 + 0x +3x^2)
+(define restar
+  (lambda (L1 L2 i)
+    (cond((< i (length L1))
+          (cons ( - (list-ref L1 i) (list-ref L2 i)) (restar L1 L2 (+ i 1)))   
+     ) (else '())
+    )
+  )
+)
+(define restapolinomios
+  (lambda (L1);recibe una lista de listas
+    (cond ( (> (length L1) 2)
+          (restapolinomios (cons(restapolinomios(cons(car L1) (cons (car(cdr L1))'()) )) (cddr L1)));THEN
+      )(else (
+              simplificar(
+                  restar (emparejar(car L1)(list-ref L1 1)) (emparejar(list-ref L1 1)(car L1)) 0
+              )
+             )
+        )
+    )
+  )
+)
+(define resta
+   (lambda (L)
+       (despliegue (restapolinomios L))
+    )
+)
+
+
 ;MULTIPLICAR
 ;multiplica los elem de una lista x un Elemento
 (define multiplicaListElem
@@ -143,9 +182,78 @@
 (define *p
   (lambda (L)
     (despliegue (sumapolinomios (multiplicaPolinomios L)))))
+
+
+;DIVISION
+;------------------------------------------------
+(define Ddo '(0 -15 -8 37 0 -20))
+(define Dsr '(-5 0 4))
+
+(define colocaCociente
+  (lambda (c grado)
+    (cond ((zero? grado) (list c))
+          (else
+           (append '(0) (colocaCociente c (- grado 1)))))))
+
+(define ultimo
+  (lambda (L)
+    (cond ((null? (cdr L)) (car L))
+          (else
+           (ultimo (cdr L))))))
+
+(define sigCociente
+  (lambda (Ddo Dsr)
+    (quotient (ultimo Ddo)(ultimo Dsr))))
+
+(define posCociente
+  (lambda (Ddo Dsr)
+    (- (length Ddo) (length Dsr))))
+
+
+(define nuevoCociente
+  (lambda (Ddo Dsr)
+    (colocaCociente (sigCociente Ddo Dsr) (posCociente Ddo Dsr))))
+
+(define paraRestar
+  (lambda (Ddo Dsr)
+    (sumapolinomios (multiplicaPolinomios (list (nuevoCociente Ddo Dsr) Dsr)))))
+
+(define divideParaCociente
+  (lambda (Ddo Dsr LCts)
+    (cond ((> (length Ddo) (length Dsr)) (divideParaCociente (restapolinomios (list Ddo (paraRestar Ddo Dsr))) Dsr (cons (nuevoCociente Ddo Dsr) LCts)))
+          (else
+           (sumapolinomios (cons (nuevoCociente Ddo Dsr) LCts))))))
+
+(define divideParaResiduo
+  (lambda (Ddo Dsr LCts)
+    (cond ((> (length Ddo) (length Dsr)) (divideParaResiduo (restapolinomios (list Ddo (paraRestar Ddo Dsr))) Dsr (cons (nuevoCociente Ddo Dsr) LCts)))
+          (else
+           (restapolinomios (list Ddo (paraRestar Ddo Dsr)))))))
+
+(define qt-p
+  (lambda (p1 p2)
+    (despliegue (divideParaCociente p1 p2 '()))))
+
+(define rem-p
+  (lambda (p1 p2)
+    (despliegue (divideParaResiduo p1 p2 '()))))
+
+(define /-p
+  (lambda (Ddo Dsr)
+    (list (divideParaCociente Ddo Dsr '()) (divideParaResiduo Ddo Dsr '()))))
+
+
 ;****************************PRUEBAS***************************
 ;(remove-last L)
 ;(simplificar L)
 ;(printE 0 9) || (printE 2 5) || (printE 8 0)
 ;(*p '((3 0 2)(4 0 3 2)))
 ;(*p '((-2 3)(-11 4 2)))
+;(qt-p '(0 -15 -8 37 0 -20)'(-5 0 4))
+;(rem-p '(0 -15 -8 37 0 -20)'(-5 0 4))
+;(qt-p '(-2 1 2)'(0 1)
+;(rem-p '(-2 1 2)'(0 1))
+;(qt-p '(-20 30 -11 -2 1)'(-2 3 1))
+;(rem-p '(-20 30 -11 -2 1)'(-2 3 1))
+;(/-p '(0 -15 -8 37 0 -20)'(-5 0 4))
+;(/-p '(-20 30 -11 -2 1)'(-2 3 1))

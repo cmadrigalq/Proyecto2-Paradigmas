@@ -32,5 +32,17 @@
           (else
            (cons (car L1) (concatenar (cdr L1) L2)))
           )))
+#|
+(define raiz-encontrada
+  (lambda (L1 )
+    (cond ((null? L1) L1)
+          (else
+           (+ (* (car (divisores (first L1))) (last L1)) (cadr (reverse L1)))
+                )
+          )
+    )
+  )
+|#
+
 ;****************************PRUEBAS***************************
 ;(divisores 6)

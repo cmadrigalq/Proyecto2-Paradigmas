@@ -192,6 +192,39 @@
       (display (mapEval L x 0))
    )
 )
+;ABS
+(define ABS
+  (lambda (x)
+     (cond ( (< x 0) (* -1 x) )
+           (else x))
+   )
+)
+
+
+;Factores comunes, para calcular la cantidad de factores comunes
+;en la primera llamada, se debe pasar un 0 a total
+(define contarFactores
+  (lambda (L total)
+     (cond (
+            (zero? (list-ref L 0))
+             total)
+           (else (contarFactores (cdr L) (+ 1 total)))
+           )
+   )
+)
+;Calcula Divisores
+(define divisores
+  (lambda (p index divisor)
+     (cond ((<  (ABS (list-ref p 0)) divisor) '())
+           (else (
+                    cond((zero? (remainder (list-ref p 0) divisor))
+                        ( append (cons divisor (cons (* -1 divisor)'())) (divisores p (+ 2 index) (+ 1 divisor))    ))
+                        (else (append (cons 0 (cons 0 '())) (divisores p (+ 2 index) (+ 1 divisor))  ))
+
+                  )))
+   )
+)
+
 
 
 

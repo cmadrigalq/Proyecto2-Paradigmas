@@ -243,6 +243,28 @@
     (list (divideParaCociente Ddo Dsr '()) (divideParaResiduo Ddo Dsr '()))))
 
 
+;FACTORIZACION
+;-----------------------------
+;(define lista-divisores
+;  (lambda (Num div)
+;    (cond ((equal? Num div) (list Num))
+;          ((zero? div) (lista-divisores Num (+ div 1)))
+;          ((integer? (/ Num div)) (cons div (lista-divisores Num (+ div 1))))
+;          (else
+;           (lista-divisores Num (+ div 1))))))
+
+;Devuelve los divisores de un numero
+;(define divisores
+;  (lambda (Num)
+;    (cond ((positive? Num) (lista-divisores Num (* Num -1)))
+;          (else
+;           (lista-divisores (* Num -1) Num)))))
+
+;Saca la raiz
+;(define saca-raiz
+;  (lambda (P)
+;    (cond ((null? (cdr P))
+
 ;****************************PRUEBAS***************************
 ;(remove-last L)
 ;(simplificar L)

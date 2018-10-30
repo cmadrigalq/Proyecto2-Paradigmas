@@ -224,7 +224,26 @@
                   )))
    )
 )
-
+;Raices
+(define raices
+  (lambda (p divisores index)
+       (
+          cond( (< index (length divisores))
+                (
+                   cond(
+                        (zero? (list-ref divisores index))
+                        ( append (raices p divisores (+ 1 index)) '() )
+                        )
+                       (else (
+                                 cond( (zero? (mapEval p (list-ref divisores index) 0) )
+                                       (append (cons (list-ref divisores index) '()) (raices p divisores (+ 1 index)) ) 
+                                      )(else ( append (raices p divisores (+ 1 index)) '() ))
+                              ))
+                 )
+              ) (else '())
+        )
+   )
+)
 
 
 
@@ -242,3 +261,4 @@
 ;(pow 5 3)
 ;(pow 555 0)
 ;(eval '(-1 4 2) 2)
+;(raices  '(4 4 1) (divisores '(4 4 1) 0 1)  0)

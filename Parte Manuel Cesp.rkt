@@ -245,25 +245,81 @@
 
 ;FACTORIZACION
 ;-----------------------------
-;(define lista-divisores
-;  (lambda (Num div)
-;    (cond ((equal? Num div) (list Num))
-;          ((zero? div) (lista-divisores Num (+ div 1)))
-;          ((integer? (/ Num div)) (cons div (lista-divisores Num (+ div 1))))
-;          (else
-;           (lista-divisores Num (+ div 1))))))
+;Potencia
+; (b,e)=> b^e
+(define pow
+  (lambda (b e)
+    (cond ((and (zero? e) (zero? b)) (display "Math Error!"))
+    (else (cond ((zero? e) 1)
+    (else (* b (pow b (- e 1)))))))
+  )
+)
+
+;Evaluar : (3+3x+(3x^2)+...+(3x^n),6) => (3+3*6+(3*6^2)+...+(3*6^n),y)
+(define mapEval
+  (lambda (L x index)
+     (cond ( (< index (length L))
+             ( + (* (list-ref L index) (pow x index)) (mapEval L x (+ 1 index)) ))
+             (else 0))
+  )
+)
+;Dos funciones para calcular divisores (versión Manuel Cesp)
+(define lista-divisores
+  (lambda (Num div)
+    (cond ((equal? Num div) (list Num))
+          ((zero? div) (lista-divisores Num (+ div 1)))
+          ((integer? (/ Num div)) (cons div (lista-divisores Num (+ div 1))))
+          (else
+           (lista-divisores Num (+ div 1))))))
 
 ;Devuelve los divisores de un numero
-;(define divisores
-;  (lambda (Num)
-;    (cond ((positive? Num) (lista-divisores Num (* Num -1)))
-;          (else
-;           (lista-divisores (* Num -1) Num)))))
+(define divisores
+  (lambda (P)
+    (cond ((zero? (car P)) (divisores (cdr P)))
+          ((positive? (car P)) (lista-divisores (car P) (* (car P) -1)))
+           (else
+            (lista-divisores (* (car P) -1) (car P))))))
 
-;Saca la raiz
-;(define saca-raiz
-;  (lambda (P)
-;    (cond ((null? (cdr P))
+;Raices
+(define raices
+  (lambda (p divisores index)
+       (
+          cond( (< index (length divisores))
+                (
+                   cond(
+                        (zero? (list-ref divisores index))
+                        ( append (raices p divisores (+ 1 index)) '() )
+                        )
+                       (else (
+                                 cond( (zero? (mapEval p (list-ref divisores index) 0) )
+                                       (append (cons (list-ref divisores index) '()) (raices p divisores (+ 1 index)) ) 
+                                      )(else ( append (raices p divisores (+ 1 index)) '() ))
+                              ))
+                 )
+              ) (else '())
+        )
+   )
+)
+
+(define raices-a-monomios
+  (lambda (raices)
+    (cond ((null? (cdr raices)) (list (list (* (car raices) -1) 1)))
+          (else
+           (cons (list (* (car raices) -1) 1) (raices-a-monomios (cdr raices)))))))
+
+(define dividePolinomioMonomios
+  (lambda (P rMonomios)
+    (cond ((null? (cdr rMonomios)) (divideParaCociente P (car rMonomios) '()))
+          (else
+           (divideParaCociente (dividePolinomioMonomios P (cdr rMonomios)) (car rMonomios) '())))))
+
+(define Factorizacion
+  (lambda (P raices)
+    (append raices (list (dividePolinomioMonomios P raices)))))
+
+(define fact-p
+  (lambda (P)
+    (Factorizacion P (raices-a-monomios (raices P (divisores P) 0)))))
 
 ;****************************PRUEBAS***************************
 ;(remove-last L)

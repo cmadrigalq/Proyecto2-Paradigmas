@@ -213,17 +213,33 @@
    )
 )
 ;Calcula Divisores
-(define divisores
-  (lambda (p index divisor)
-     (cond ((<  (ABS (list-ref p 0)) divisor) '())
-           (else (
-                    cond((zero? (remainder (list-ref p 0) divisor))
-                        ( append (cons divisor (cons (* -1 divisor)'())) (divisores p (+ 2 index) (+ 1 divisor))    ))
-                        (else (append (cons 0 (cons 0 '())) (divisores p (+ 2 index) (+ 1 divisor))  ))
+;(define divisores
+;  (lambda (p index divisor)
+;     (cond ((<  (ABS (list-ref p 0)) divisor) '())
+;           (else (
+;                    cond((zero? (remainder (list-ref p 0) divisor))
+;                        ( append (cons divisor (cons (* -1 divisor)'())) (divisores p (+ 2 index) (+ 1 divisor))    ))
+;                        (else (append (cons 0 (cons 0 '())) (divisores p (+ 2 index) (+ 1 divisor))  ))
 
-                  )))
-   )
-)
+;                  )))
+;   )
+;)
+;Dos funciones para calcular divisores (versión Manuel Cesp)
+(define lista-divisores
+  (lambda (Num div)
+    (cond ((equal? Num div) (list Num))
+          ((zero? div) (lista-divisores Num (+ div 1)))
+          ((integer? (/ Num div)) (cons div (lista-divisores Num (+ div 1))))
+          (else
+           (lista-divisores Num (+ div 1))))))
+
+;Devuelve los divisores de un numero
+(define divisores
+  (lambda (Num)
+    (cond ((positive? Num) (lista-divisores Num (* Num -1)))
+          (else
+           (lista-divisores (* Num -1) Num)))))
+
 ;Raices
 (define raices
   (lambda (p divisores index)
